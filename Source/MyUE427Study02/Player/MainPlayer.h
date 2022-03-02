@@ -29,17 +29,31 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float nowHP;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float maxHP;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float nowHungry;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
+	float maxHungry;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float hungrySpeed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
+	float nowSaturation;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
+	float maxSaturation;
+
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
+	float saturationSpeed;
 
 protected:
 	/** Resets HMD orientation in VR. */
@@ -70,7 +84,9 @@ protected:
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 	virtual void Tick(float DeltaSeconds) override;
-	
+
+	virtual float MyTakeDamage(float damageAmount, AActor* damageCauser);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

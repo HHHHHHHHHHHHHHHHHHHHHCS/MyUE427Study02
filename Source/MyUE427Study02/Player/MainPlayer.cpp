@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -15,6 +16,8 @@
 
 AMainPlayer::AMainPlayer()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -48,8 +51,16 @@ AMainPlayer::AMainPlayer()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
-	nowHungry = 100.0f;
+	maxHP = 100.0f;
+	nowHP = maxHP;
+
+	maxHungry = 100.0f;
+	nowHungry = maxHungry;
 	hungrySpeed = 1.0f;
+
+	maxSaturation = 100.0f;
+	nowSaturation = maxSaturation;
+	saturationSpeed = 1.0f;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -105,10 +116,22 @@ void AMainPlayer::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 
 void AMainPlayer::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+
 	nowHungry -= hungrySpeed * DeltaSeconds;
-	if (nowHungry <= 0)
+	const float tempHungry = nowHungry;
+	nowHungry = FMath::Clamp(nowHungry, 0.0f, maxHungry);
+	if (tempHungry < 0)
 	{
-		UKismetSystemLibrary::PrintString(this, "Hungry", true, true, FLinearColor::Blue, 2.0f);
+		this->MyTakeDamage(-tempHungry, nullptr);
+	}
+
+	nowSaturation -= saturationSpeed * DeltaSeconds;
+	const float tempSaturation = nowSaturation;
+	nowSaturation = FMath::Clamp(nowSaturation, 0.0f, maxSaturation);
+	if (tempSaturation < 0)
+	{
+		this->MyTakeDamage(-tempSaturation, nullptr);
 	}
 }
 
@@ -151,4 +174,20 @@ void AMainPlayer::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+float AMainPlayer::MyTakeDamage(float damageAmount, AActor* damageCauser)
+{
+	if (damageAmount < 0)
+	{
+		UKismetSystemLibrary::PrintString(this, "MyTakeDamage damageAmount < 0");
+		return nowHP;
+	}
+
+	nowHP = FMath::Clamp(nowHP - damageAmount, 0.0f, maxHP);
+	if (nowHP <= 0)
+	{
+	}
+
+	return nowHP;
 }

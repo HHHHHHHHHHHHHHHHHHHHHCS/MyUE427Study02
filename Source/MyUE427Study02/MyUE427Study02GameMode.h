@@ -12,8 +12,15 @@ class AMyUE427Study02GameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI Widgets")
+	TSubclassOf<class UUserWidget> mainUIClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI Widgets")
+	UUserWidget* mainUI;
+
+public:
 	AMyUE427Study02GameMode();
+
+protected:
+	virtual void BeginPlay() override;
 };
-
-
-

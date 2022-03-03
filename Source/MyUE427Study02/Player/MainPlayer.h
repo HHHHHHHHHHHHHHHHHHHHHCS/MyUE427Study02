@@ -18,6 +18,7 @@ class AMainPlayer : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+	
 public:
 	AMainPlayer();
 
@@ -46,7 +47,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float nowSaturation;
-
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float maxSaturation;

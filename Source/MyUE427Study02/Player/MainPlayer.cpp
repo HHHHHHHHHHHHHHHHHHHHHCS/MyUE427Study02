@@ -66,6 +66,8 @@ AMainPlayer::AMainPlayer()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
+#pragma region Input
+
 void AMainPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
@@ -92,7 +94,6 @@ void AMainPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMainPlayer::OnResetVR);
 }
 
-
 void AMainPlayer::OnResetVR()
 {
 	// If MyUE427Study02 is added to a project via 'Add Feature' in the Unreal Editor the dependency on HeadMountedDisplay in MyUE427Study02.Build.cs is not automatically propagated
@@ -112,27 +113,6 @@ void AMainPlayer::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 void AMainPlayer::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
 	StopJumping();
-}
-
-void AMainPlayer::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	nowHungry -= hungrySpeed * DeltaSeconds;
-	const float tempHungry = nowHungry;
-	nowHungry = FMath::Clamp(nowHungry, 0.0f, maxHungry);
-	if (tempHungry < 0)
-	{
-		this->MyTakeDamage(-tempHungry, nullptr);
-	}
-
-	nowSaturation -= saturationSpeed * DeltaSeconds;
-	const float tempSaturation = nowSaturation;
-	nowSaturation = FMath::Clamp(nowSaturation, 0.0f, maxSaturation);
-	if (tempSaturation < 0)
-	{
-		this->MyTakeDamage(-tempSaturation, nullptr);
-	}
 }
 
 void AMainPlayer::TurnAtRate(float Rate)
@@ -175,6 +155,30 @@ void AMainPlayer::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+#pragma endregion 
+
+void AMainPlayer::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	nowHungry -= hungrySpeed * DeltaSeconds;
+	const float tempHungry = nowHungry;
+	nowHungry = FMath::Clamp(nowHungry, 0.0f, maxHungry);
+	if (tempHungry < 0)
+	{
+		this->MyTakeDamage(-tempHungry, nullptr);
+	}
+
+	nowSaturation -= saturationSpeed * DeltaSeconds;
+	const float tempSaturation = nowSaturation;
+	nowSaturation = FMath::Clamp(nowSaturation, 0.0f, maxSaturation);
+	if (tempSaturation < 0)
+	{
+		this->MyTakeDamage(-tempSaturation, nullptr);
+	}
+}
+
 
 float AMainPlayer::MyTakeDamage(float damageAmount, AActor* damageCauser)
 {

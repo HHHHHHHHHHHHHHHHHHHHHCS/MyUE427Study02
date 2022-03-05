@@ -48,6 +48,18 @@ AMainPlayer::AMainPlayer()
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	cameraHead = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraHead"));
+	cameraHead->SetupAttachment(GetMesh(), "Head");
+	cameraHead->TargetArmLength = 0.0f;
+	cameraHead->bUsePawnControlRotation = true;
+	cameraHead->SetWorldRotation(FRotator(-90, 0, 90));
+
+	perspectiveCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PerspectiveCamera"));
+	perspectiveCamera->SetRelativeLocation(FVector(0, 10, 0));
+	perspectiveCamera->SetupAttachment(cameraHead, USpringArmComponent::SocketName);
+	perspectiveCamera->bUsePawnControlRotation = false;
+	perspectiveCamera->SetAutoActivate(false);
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
@@ -92,6 +104,9 @@ void AMainPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCo
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMainPlayer::OnResetVR);
+
+	PlayerInputComponent->BindAction("ChangePlayerPerspective", IE_Pressed, this,
+	                                 &AMainPlayer::OnChangePlayerPerspective);
 }
 
 void AMainPlayer::OnResetVR()
@@ -156,7 +171,7 @@ void AMainPlayer::MoveRight(float Value)
 	}
 }
 
-#pragma endregion 
+#pragma endregion
 
 void AMainPlayer::Tick(float DeltaSeconds)
 {
@@ -194,4 +209,13 @@ float AMainPlayer::MyTakeDamage(float damageAmount, AActor* damageCauser)
 	}
 
 	return nowHP;
+}
+
+void AMainPlayer::OnChangePlayerPerspective()
+{
+	// getcom(TSubclassOf<UCameraComponent>,FName( "CameraHead"));
+
+	FollowCamera->ToggleActive();
+	perspectiveCamera->ToggleActive();
+	bUseControllerRotationYaw = !bUseControllerRotationYaw;
 }

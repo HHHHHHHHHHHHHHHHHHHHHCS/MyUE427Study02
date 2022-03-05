@@ -49,13 +49,13 @@ AMainPlayer::AMainPlayer()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	cameraHead = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraHead"));
-	cameraHead->SetupAttachment(GetMesh(), "Head");
+	cameraHead->SetupAttachment(GetMesh(), "head");
+	cameraHead->AddRelativeLocation(FVector(0, 10, 0));
 	cameraHead->TargetArmLength = 0.0f;
 	cameraHead->bUsePawnControlRotation = true;
 	cameraHead->SetWorldRotation(FRotator(-90, 0, 90));
 
 	perspectiveCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PerspectiveCamera"));
-	perspectiveCamera->SetRelativeLocation(FVector(0, 10, 0));
 	perspectiveCamera->SetupAttachment(cameraHead, USpringArmComponent::SocketName);
 	perspectiveCamera->bUsePawnControlRotation = false;
 	perspectiveCamera->SetAutoActivate(false);
@@ -213,8 +213,6 @@ float AMainPlayer::MyTakeDamage(float damageAmount, AActor* damageCauser)
 
 void AMainPlayer::OnChangePlayerPerspective()
 {
-	// getcom(TSubclassOf<UCameraComponent>,FName( "CameraHead"));
-
 	FollowCamera->ToggleActive();
 	perspectiveCamera->ToggleActive();
 	bUseControllerRotationYaw = !bUseControllerRotationYaw;

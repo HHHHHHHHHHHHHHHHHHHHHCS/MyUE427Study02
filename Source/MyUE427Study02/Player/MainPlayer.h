@@ -58,7 +58,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float maxSaturation;
-
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float saturationSpeed;

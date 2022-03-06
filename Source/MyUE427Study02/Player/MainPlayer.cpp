@@ -66,6 +66,13 @@ AMainPlayer::AMainPlayer()
 	maxHP = 100.0f;
 	nowHP = maxHP;
 
+	maxEnergy = 100.0f;
+	nowEnergy = maxEnergy;
+	runEnergy = 10.0f;
+	walkSpeed = 600.0f;
+	runSpeed = 1200.0f;
+	OnReleasedDash();
+
 	maxHungry = 100.0f;
 	nowHungry = maxHungry;
 	hungrySpeed = 1.0f;
@@ -107,6 +114,11 @@ void AMainPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("ChangePlayerPerspective", IE_Pressed, this,
 	                                 &AMainPlayer::OnChangePlayerPerspective);
+
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this,
+	                                 &AMainPlayer::OnPressedDash);
+	PlayerInputComponent->BindAction("Dash", IE_Released, this,
+	                                 &AMainPlayer::OnReleasedDash);
 }
 
 void AMainPlayer::OnResetVR()
@@ -177,7 +189,27 @@ void AMainPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	nowHungry -= hungrySpeed * DeltaSeconds;
+	UpdatePlayerStatus(DeltaSeconds);
+}
+
+void AMainPlayer::UpdatePlayerStatus(float deltaSeconds)
+{
+	const float speed = GetVelocity().Size();
+
+	if (isDash && speed > walkSpeed)
+	{
+		if (nowEnergy <= 0)
+		{
+			OnReleasedDash();
+		}
+		nowEnergy = FMath::Max(0.0f, nowEnergy - runEnergy * deltaSeconds);
+	}
+	else
+	{
+		nowEnergy = FMath::Min(maxEnergy, nowEnergy + runEnergy * deltaSeconds);
+	}
+
+	nowHungry -= hungrySpeed * deltaSeconds;
 	const float tempHungry = nowHungry;
 	nowHungry = FMath::Clamp(nowHungry, 0.0f, maxHungry);
 	if (tempHungry < 0)
@@ -185,7 +217,7 @@ void AMainPlayer::Tick(float DeltaSeconds)
 		this->MyTakeDamage(-tempHungry, nullptr);
 	}
 
-	nowSaturation -= saturationSpeed * DeltaSeconds;
+	nowSaturation -= saturationSpeed * deltaSeconds;
 	const float tempSaturation = nowSaturation;
 	nowSaturation = FMath::Clamp(nowSaturation, 0.0f, maxSaturation);
 	if (tempSaturation < 0)
@@ -216,4 +248,22 @@ void AMainPlayer::OnChangePlayerPerspective()
 	FollowCamera->ToggleActive();
 	perspectiveCamera->ToggleActive();
 	bUseControllerRotationYaw = !bUseControllerRotationYaw;
+}
+
+void AMainPlayer::OnPressedDash()
+{
+	if (nowEnergy <= 0)
+	{
+		OnReleasedDash();
+		return;
+	}
+
+	isDash = true;
+	GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+}
+
+void AMainPlayer::OnReleasedDash()
+{
+	isDash = false;
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 }

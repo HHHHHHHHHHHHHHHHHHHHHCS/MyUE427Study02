@@ -22,11 +22,11 @@ class AMainPlayer : public ACharacter
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* cameraHead;
-	
+
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* perspectiveCamera;
-	
+
 public:
 	AMainPlayer();
 
@@ -45,6 +45,21 @@ public:
 	float maxHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
+	float nowEnergy;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
+	float runEnergy;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Status", meta = (ClampMin=0))
+	float walkSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Status", meta = (ClampMin=0))
+	float runSpeed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
+	float maxEnergy;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float nowHungry;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
@@ -58,10 +73,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float maxSaturation;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float saturationSpeed;
 
+private:
+	bool isDash;
+	
 protected:
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -91,6 +109,8 @@ protected:
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 	virtual void Tick(float DeltaSeconds) override;
+	
+	void UpdatePlayerStatus(float deltaSeconds);
 
 	virtual float MyTakeDamage(float damageAmount, AActor* damageCauser);
 
@@ -105,5 +125,12 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	FORCEINLINE void OnChangePlayerPerspective();
+	UFUNCTION()
+	void OnChangePlayerPerspective();
+
+	UFUNCTION()
+	void OnPressedDash();
+	
+	UFUNCTION()
+	void OnReleasedDash();
 };

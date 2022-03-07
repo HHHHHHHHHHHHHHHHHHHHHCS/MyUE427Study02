@@ -204,7 +204,7 @@ void AMainPlayer::UpdatePlayerStatus(float deltaSeconds)
 		}
 		nowEnergy = FMath::Max(0.0f, nowEnergy - runEnergy * deltaSeconds);
 	}
-	else
+	else if (nowHungry > 0 && nowSaturation > 0)
 	{
 		nowEnergy = FMath::Min(maxEnergy, nowEnergy + runEnergy * deltaSeconds);
 	}
@@ -266,4 +266,9 @@ void AMainPlayer::OnReleasedDash()
 {
 	isDash = false;
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+}
+
+void AMainPlayer::AddHungry(float val)
+{
+	nowHungry = FMath::Clamp(nowHungry + val, 0.0f, maxHungry);
 }

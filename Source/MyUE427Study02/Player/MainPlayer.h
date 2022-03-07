@@ -133,4 +133,6 @@ public:
 	
 	UFUNCTION()
 	void OnReleasedDash();
+
+	void AddHungry(float val);
 };

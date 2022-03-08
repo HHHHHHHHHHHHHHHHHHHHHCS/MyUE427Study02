@@ -46,10 +46,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float nowEnergy;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Status", meta = (ClampMin=0))
 	float runEnergy;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Status", meta = (ClampMin=0))
 	float walkSpeed;
 
@@ -79,7 +79,7 @@ public:
 
 private:
 	bool isDash;
-	
+
 protected:
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -109,7 +109,7 @@ protected:
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 	virtual void Tick(float DeltaSeconds) override;
-	
+
 	void UpdatePlayerStatus(float deltaSeconds);
 
 	virtual float MyTakeDamage(float damageAmount, AActor* damageCauser);
@@ -130,9 +130,11 @@ public:
 
 	UFUNCTION()
 	void OnPressedDash();
-	
+
 	UFUNCTION()
 	void OnReleasedDash();
 
 	void AddHungry(float val);
+
+	void AddSaturation(float val);
 };

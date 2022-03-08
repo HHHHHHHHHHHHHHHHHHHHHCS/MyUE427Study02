@@ -272,3 +272,8 @@ void AMainPlayer::AddHungry(float val)
 {
 	nowHungry = FMath::Clamp(nowHungry + val, 0.0f, maxHungry);
 }
+
+void AMainPlayer::AddSaturation(float val)
+{
+	nowSaturation = FMath::Clamp(nowSaturation + val, 0.0f, maxSaturation);
+}

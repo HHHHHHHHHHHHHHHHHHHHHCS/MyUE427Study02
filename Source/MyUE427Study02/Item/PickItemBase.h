@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
+#include "MyUE427Study02/Player/MainPlayer.h"
 #include "PickItemBase.generated.h"
 
 UCLASS()
@@ -14,6 +16,9 @@ class MYUE427STUDY02_API APickItemBase : public AActor
 public:
 	// Sets default values for this actor's properties
 	APickItemBase();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item")
+	USphereComponent* itemCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item")
 	UStaticMeshComponent* itemMesh;
@@ -31,7 +36,11 @@ public:
 	                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	                            const FHitResult& SweepResult);
 
+	virtual void DoBeginOverlap(AMainPlayer* mainPlayer);
+
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	virtual void DoEndOverlap(AMainPlayer* mainPlayer);
 };

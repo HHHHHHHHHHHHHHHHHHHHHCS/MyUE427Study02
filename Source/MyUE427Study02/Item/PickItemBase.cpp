@@ -11,10 +11,15 @@ APickItemBase::APickItemBase()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	itemCollision = CreateDefaultSubobject<USphereComponent>(TEXT("ItemCollision"));
+	itemCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	itemCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	itemCollision->SetSphereRadius(64.0f);
+	SetRootComponent(itemCollision);
+
 	itemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
-	itemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	itemMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-	itemMesh->SetupAttachment(GetRootComponent());
+	itemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	itemMesh->SetupAttachment(itemCollision);
 }
 
 // Called when the game starts or when spawned
@@ -22,8 +27,8 @@ void APickItemBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	itemMesh->OnComponentBeginOverlap.AddDynamic(this, &APickItemBase::OnBeginOverlap);
-	itemMesh->OnComponentEndOverlap.AddDynamic(this, &APickItemBase::OnEndOverlap);
+	itemCollision->OnComponentBeginOverlap.AddDynamic(this, &APickItemBase::OnBeginOverlap);
+	itemCollision->OnComponentEndOverlap.AddDynamic(this, &APickItemBase::OnEndOverlap);
 }
 
 
@@ -40,14 +45,27 @@ void APickItemBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	AMainPlayer* mainPlayer = Cast<AMainPlayer>(OtherActor);
 	if (mainPlayer)
 	{
-		mainPlayer->AddHungry(25.0f);
+		DoBeginOverlap(mainPlayer);
 
-		itemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		itemCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		Destroy();
 	}
 }
 
+void APickItemBase::DoBeginOverlap(AMainPlayer* mainPlayer)
+{
+}
+
 void APickItemBase::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AMainPlayer* mainPlayer = Cast<AMainPlayer>(OtherActor);
+	if (mainPlayer)
+	{
+		DoEndOverlap(mainPlayer);
+	}
+}
+
+void APickItemBase::DoEndOverlap(AMainPlayer* mainPlayer)
 {
 }

@@ -49,7 +49,7 @@ AMainPlayer::AMainPlayer()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	cameraHead = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraHead"));
-	cameraHead->SetupAttachment(GetMesh(), "head");
+	cameraHead->SetupAttachment(GetMesh());
 	cameraHead->AddRelativeLocation(FVector(0, 10, 0));
 	cameraHead->TargetArmLength = 0.0f;
 	cameraHead->bUsePawnControlRotation = true;

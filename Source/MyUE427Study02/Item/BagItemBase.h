@@ -18,7 +18,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item")
 	UStaticMeshComponent* displayMesh;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item")
 	FItemStateData itemStateData;
 
@@ -33,4 +33,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category="Item")
+	virtual void UpdateMesh();
 };

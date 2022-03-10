@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MainPlayer.h"
+
+#include "DrawDebugHelpers.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -30,6 +32,17 @@ AMainPlayer::AMainPlayer()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> skeletalMesh(
+		TEXT("SkeletalMesh'/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin'"));
+
+	if (skeletalMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(skeletalMesh.Object);
+	}
+
+	GetMesh()->SetRelativeLocation(FVector(0, 0, -95.0f));
+	GetMesh()->SetRelativeRotation(FRotator(0, -90.0f, 0));
+
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
@@ -49,7 +62,8 @@ AMainPlayer::AMainPlayer()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	cameraHead = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraHead"));
-	cameraHead->SetupAttachment(GetMesh());
+	cameraHead->SetupAttachment(GetMesh(), "HeadSocket");
+	// UKismetSystemLibrary::PrintString(this, GetMesh()->GetSocketLocation("HeadSocket").ToString());
 	cameraHead->AddRelativeLocation(FVector(0, 10, 0));
 	cameraHead->TargetArmLength = 0.0f;
 	cameraHead->bUsePawnControlRotation = true;
@@ -119,6 +133,9 @@ void AMainPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCo
 	                                 &AMainPlayer::OnPressedDash);
 	PlayerInputComponent->BindAction("Dash", IE_Released, this,
 	                                 &AMainPlayer::OnReleasedDash);
+
+	//https://www.cnblogs.com/mcomco/p/9983624.html
+	PlayerInputComponent->BindKey(EKeys::E, IE_Released, this, &AMainPlayer::RayCast);
 }
 
 void AMainPlayer::OnResetVR()
@@ -276,4 +293,34 @@ void AMainPlayer::AddHungry(float val)
 void AMainPlayer::AddSaturation(float val)
 {
 	nowSaturation = FMath::Clamp(nowSaturation + val, 0.0f, maxSaturation);
+}
+
+void AMainPlayer::RayCast()
+{
+	FVector startPos = FollowCamera->GetComponentLocation();
+	FVector dir = FollowCamera->GetForwardVector();
+	startPos = startPos + dir * 300.0f; //因为摄像机往后移动了300
+	FVector endPos = startPos + dir * 1500.0f; //因为摄像机往后移动了300
+
+	// 碰撞参数
+	FCollisionQueryParams collisonQueryParams(TEXT("QueryParams"), true, nullptr);
+	collisonQueryParams.bTraceComplex = true;
+	collisonQueryParams.bReturnPhysicalMaterial = false;
+	collisonQueryParams.AddIgnoredActor(this);
+
+	TArray<AActor*> arrayIgnoreActor;
+	FHitResult hitResult;
+
+	// UKismetSystemLibrary::LineTraceSingle 其实最后调用的还是  GetWorld()->LineTraceSingleByChannel
+	// GetWorld()->LineTraceSingleByChannel(hitResult, startPos, endPos, ECollisionChannel::ECC_Visibility,
+	//                                      collisonQueryParams);
+	bool isHit = UKismetSystemLibrary::LineTraceSingle(this, startPos, endPos,
+	                                                   ETraceTypeQuery::TraceTypeQuery1, true, arrayIgnoreActor,
+	                                                   EDrawDebugTrace::ForDuration, hitResult, true, FLinearColor::Red,
+	                                                   FLinearColor::Green, 0.1f);
+
+	if (isHit && hitResult.GetActor())
+	{
+		UKismetSystemLibrary::PrintString(GetWorld(), hitResult.GetActor()->GetName());
+	}
 }

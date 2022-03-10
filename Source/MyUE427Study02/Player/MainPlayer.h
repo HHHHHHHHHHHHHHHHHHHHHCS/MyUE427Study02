@@ -137,4 +137,6 @@ public:
 	void AddHungry(float val);
 
 	void AddSaturation(float val);
+
+	void RayCast();
 };

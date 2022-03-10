@@ -15,28 +15,24 @@ ABagItemBase::ABagItemBase()
 	itemStateData.data.DataTable
 		= LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/Blueprints/Data/BagItemDataTable.BagItemDataTable'"));
 	itemStateData.data.RowName = "Empty";
-
-	
-	const UDataTable* table = itemStateData.data.DataTable;
-
-	if (table != nullptr)
-	{
-		itemData = table->FindRow<FBagItemData>(itemStateData.data.RowName, "");
-
-		if (itemData != nullptr && itemData->itemMesh != nullptr)
-		{
-			displayMesh->SetStaticMesh(itemData->itemMesh);
-		}
-	}
 }
 
 // Called when the game starts or when spawned
 void ABagItemBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
+// Called every frame
+void ABagItemBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 
-	//构造函数的时候无法识别，  需要在beginplay中重新设置
+}
+
+void ABagItemBase::UpdateMesh()
+{
+	//构造函数的时候无法识别，  需要在beginplay/蓝图的构造函数中重新设置
 	//如果物体没有碰撞资源， 就不会产生碰撞
 	const UDataTable* table = itemStateData.data.DataTable;
 
@@ -49,10 +45,4 @@ void ABagItemBase::BeginPlay()
 			displayMesh->SetStaticMesh(itemData->itemMesh);
 		}
 	}
-}
-
-// Called every frame
-void ABagItemBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }

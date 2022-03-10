@@ -9,6 +9,6 @@ public class MyUE427Study02 : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "UMG" });
+			{ "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "UMG", "Slate" });
 	}
 }
